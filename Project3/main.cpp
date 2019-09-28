@@ -1,359 +1,208 @@
-#include <iostream>
-
+﻿#include<iostream>
+#include<string>
 using namespace std;
-#define tab "\t"
-//#define BASE_CHECK
 
-template <typename T> class  List {
-
-	template <typename T>class Element
-	{
-		T Data;
-		Element<T>* pNext;
-		Element<T>* pPrev;
-	public:
-		Element(T Data, Element<T>* pNext = nullptr, Element<T>* pPrev = nullptr);
-
-		~Element();
-
-		/*int operator* ()
-		{
-		return this->Data;
-		}
-		const int operator* () const
-		{
-		return this->Data;
-		}*/
-		operator T&();
-
-		friend class List<T>;
-	};
-	Element<T>* Head;
-	Element<T>* Tail;
-	int size;
+class Human
+{
+protected:
+	string name;
+	unsigned int age;
 public:
-
-	class Iterator
+	const string& get_name()const
 	{
-		Element<T>* Temp;
-	public:
-		Iterator(Element<T>* Temp = nullptr)
-		{
-			this->Temp = Temp;
-			cout << "ITConstructor:\t" << this << endl;
-		}
-		~Iterator()
-		{
-			cout << "ITDestructor:\t\t" << this << endl;
-		}
-		Iterator& operator++()
-		{
-			Temp = Temp->pNext;
-			return *this;
-		}
-
-		Iterator operator++(int)
-		{
-			Iterator old = *this;
-			Temp = Temp->pNext;
-			return old;
-		}
-		T& operator*()
-		{
-			return Temp->Data;
-		}
-		const T& operator*() const
-		{
-			return Temp->Data;
-		}
-		bool operator ==(const Iterator& other) const
-		{
-			return this->Temp == other.Temp;
-		}
-		bool operator != (const Iterator& other) const
-		{
-			return this->Temp != other.Temp;
-		}
-	};
-	T get_size() const
-	{
-		return this->size;
+		return this->name;
 	}
-	Iterator begin()
+	unsigned int get_age()const
 	{
-		return this->Head;
+		return this->age;
 	}
-	const Iterator begin() const
+	void set_name(string& name)
 	{
-		return this->Head;
+		this->name = name;
 	}
-	Iterator end()
+	void set_age(unsigned int age)
 	{
-		return nullptr;
+		this->age = age;
 	}
-	const Iterator end() const
+	Human(string name, unsigned int age) :name(name), age(age)
 	{
-		return nullptr;
+		cout << "HConstructor:\t" << this << endl;
 	}
-	List()
+	~Human()
 	{
-		Head = Tail = nullptr;
-		size = 0;
-		cout << "LConstructor:\t\t" << this << endl;
-	}
-	List(initializer_list<T> il) : List()
-	{
-		for (const int* it = il.begin(); it != il.end(); it++)
-		{
-			push_back(*it);
-		}
-	}
-	~List()
-	{
-		while (Head) pop_front();
-		cout << "LDestructor:\t\t" << this << endl;
-	}
-	// Operators:
-	T& operator [](int Index)
-	{
-		Element<T>* Temp;
-		if (Index < size / 2)
-		{
-			Temp = Head;
-			for (int i = 0; i < Index; i++)Temp = Temp->pNext;
-		}
-		else
-		{
-			Temp = Tail;
-			for (int i = size - 1; i > Index; i--) Temp = Temp->pPrev;
-		}
-		return Temp->Data;
+		cout << "HDestructor:\t" << this << endl;
 	}
 
-	const T& operator [](int Index) const
+	//		Methods
+	void info()
 	{
-		Element<T>* Temp;
-		if (Index < size / 2)
-		{
-			Temp = Head;
-			for (int i = 0; i < Index; i++)Temp = Temp->pNext;
-		}
-		else
-		{
-			Temp = Tail;
-			for (int i = size - 1; i > Index; i--) Temp = Temp->pPrev;
-		}
-		return Temp->Data;
-	}
-	// Adding Elements
-	void push_front(int Data)
-	{
-		Element<T>* New = new Element<T>(Data);
-		if (Head == nullptr)
-		{
-			Head = Tail = New;
-		}
-		else
-		{
-			New->pNext = Head;
-			Head->pPrev = New;
-			Head = New;
-		}
-		size++;
-	}
-	void push_back(int Data)
-	{
-		Element<T>* New = new Element<T>(Data);
-		if (Tail == nullptr)
-		{
-			Head = Tail = New;
-		}
-		else
-		{
-			New->pPrev = Tail;
-			Tail->pNext = New;
-			Tail = New;
-		}
-		size++;
-	}
-	void insert(int Index, int Data)
-	{
-		if (Index == 0)
-		{
-			push_front(Data);
-			return;
-		}
-		if (Head == nullptr)
-		{
-			push_front(Data);
-			return;
-		}
-		Element<T>* Temp = nullptr;
-		if (Index <= (size / 2))
-		{
-			Temp = Head;
-			for (int i = 0; i < Index; i++)
-			{
-				if (Temp->pNext == nullptr)break;
-				Temp = Temp->pNext;
-			}
-		}
-		else
-		{
-			Temp = Tail;
-			for (int i = size - 1; i > Index; i--)
-			{
-				if (Temp->pPrev == nullptr)break;
-				Temp = Temp->pPrev;
-			}
-		}
-		/*Element* New = new Element(Data);
-		New->pNext = Temp;
-		New->pPrev = Temp->pPrev;
-		Temp->pPrev->pNext = New;
-		Temp->pPrev = New;*/
-		Temp->pPrev = Temp->pPrev->pNext = new Element<T>(Data, Temp, Temp->pPrev);
-		size++;
-	}
-	void pop_front()
-	{
-		if (Head == Tail)
-		{
-			delete Head;
-			Head = Tail = nullptr;
-			return;
-		}
-		Head = Head->pNext;
-		delete Head->pPrev;
-		Head->pPrev = nullptr;
-		size--;
-	}
-	void pop_back()
-	{
-		if (Head == nullptr)return;
-		if (Head->pNext == nullptr)
-		{
-			pop_front();
-			return;
-		}
-		Tail = Tail->pPrev;
-		delete Tail->pNext;
-		Tail->pNext = nullptr;
-		size--;
-	}
-	void erase(int Index)
-	{
-		if (Head == nullptr)return;
-		if (Index == 0)
-		{
-			pop_front();
-			return;
-		}
-		if (Index >= (size - 1))
-		{
-			pop_back();
-			return;
-		}
-
-		Element<T>* Temp;
-		if (Index <= (size / 2))
-		{
-			Temp = Head;
-			for (int i = 0; i < Index; i++)
-			{
-				if (Temp->pNext == nullptr)break;
-				Temp = Temp->pNext;
-			}
-		}
-		else
-		{
-			Temp = Tail;
-			for (int i = size - 1; i > Index; i--)
-			{
-				if (Temp->pPrev == nullptr)break;
-				Temp = Temp->pPrev;
-			}
-		}
-		Temp->pPrev->pNext = Temp->pNext;
-		Temp->pNext->pPrev = Temp->pPrev;
-		delete Temp;
-		size--;
-	}
-
-	void print()
-	{
-		for (Element<T>* Temp = Head; Temp; Temp = Temp->pNext)
-		{
-			cout << Temp->pPrev << tab << Temp << tab << Temp->Data << tab << Temp->pNext << endl;
-		}
-		cout << "���-�� ��������� � ������: " << size << endl;
-	}
-	void print_reverse()
-	{
-		for (Element<T>* Temp = Tail; Temp; Temp = Temp->pPrev)
-		{
-			cout << Temp->pPrev << tab << Temp << tab << Temp->Data << tab << Temp->pNext << endl;
-		}
-		cout << "���-�� ��������� � ������: " << size << endl;
+		cout << name << " " << age << " ëåò\n";
 	}
 };
 
+class Student :public Human
+{
+	string specialty;
+	unsigned int year;//ãîä îáó÷åíèÿ.
+	int karma;	//óñïåâàåìîñòü
+public:
+	const string& get_specialty() const
+	{
+		return this->specialty;
+	}
+	unsigned int get_year() const
+	{
+		return this->year;
+	}
+	int get_karma() const
+	{
+		return this->karma;
+	}
+	const string& set_specialty(const string& specialty)
+	{
+		return this->specialty = specialty;
+	}
+	unsigned int set_year(unsigned int year)
+	{
+		return this->year = year;
+	}
+	int set_karma(int karma)
+	{
+		return this->karma = karma;
+	}
+	//			Constructors:
+	Student
+	(
+		const string& name, unsigned int age,
+		const string& specialty, unsigned int year = 1, int karma = 0
+	) :Human(name, age)
+	{
+		this->specialty = specialty;
+		this->year = year;
+		this->karma = karma;
+		cout << "SConstructor:\t" << this << endl;
+	}
+	~Student()
+	{
+		cout << "SDestructor:\t" << this << endl;
+	}
 
-template<typename T>
-template<typename ET>
-List<T>::Element<ET>::Element(ET Data, List<T>::Element<ET>* pNext, List<T>::Element<ET>* pPrev) : Data(Data), pNext(pNext), pPrev(pPrev)
+	//			Methods:
+	void info()
+	{
+		Human::info();
+		cout << ", ñïåöèàëüíîñòü " << specialty
+			<< ", " << year << "-é êóðñ, óñïåâàåìîñòü " << karma << "!" << endl;
+	}
+};
+
+class Teacher :public Human
 {
-	cout << "Econstructor:\t" << this << endl;
-}
-template<typename T>template<typename ET>List<T>::Element<ET>::~Element()
+	string specialty;
+	unsigned int xp;
+	int evil;
+public:
+	const string& get_specialty() const
+	{
+		return this->specialty;
+	}
+	unsigned int get_xp() const
+	{
+		return this->xp;
+	}
+	int get_evil() const
+	{
+		return this->evil;
+	}
+	const string& set_specialty(const string& specialty)
+	{
+		return this->specialty = specialty;
+	}
+	unsigned int set_xp(unsigned int xp)
+	{
+		return this->xp = xp;
+	}
+	int set_evil(int evil)
+	{
+		return this->evil = evil;
+	}
+
+	//				Constructors:
+	Teacher
+	(
+		const string& name, unsigned int age,
+		const string& specialty, unsigned int xp = 0, int evil = 0
+	) :Human(name, age)
+	{
+		this->specialty = specialty;
+		this->xp = xp;
+		this->evil = evil;
+		cout << "TConstructor:\t" << this << endl;
+	}
+	~Teacher()
+	{
+		cout << "TDestructor:\t" << this << endl;
+	}
+
+	//			Methods:
+	void info()
+	{
+		Human::info();
+		cout << "Ñïåöèàëüíîñòü: " << specialty
+			<< ", îïûò ïðåïîäàâàíèÿ: " << xp << " ëåò, "
+			<< "óðîâåíü çëîñòè: " << evil << "%" << endl;
+	}
+};
+
+class Graduate :public Student
 {
-	cout << "EDestructor:\t" << this << endl;
-}
-/*int operator* ()
-{
-return this->Data;
-}
-const int operator* () const
-{
-return this->Data;
-}*/
-template<typename T>template<typename ET>List<T>::Element<ET>::operator ET&()
-{
-	return this->Data;
-}
+	string diploma_theme;
+public:
+	const string& get_diploma_theme() const
+	{
+		return this->diploma_theme;
+	}
+	const string& set_diploma_theme(const string& diploma_theme)
+	{
+		return this->diploma_theme = diploma_theme;
+	}
+	//			Constructors:
+	Graduate
+	(
+		const string& name, unsigned int age,
+		const string& specialty, unsigned int year, int karma,
+		const string& diploma_theme
+	) :Student(name, age, specialty, year, karma)
+	{
+		this->diploma_theme = diploma_theme;
+		cout << "GConstructor:\t" << this << endl;
+	}
+	~Graduate()
+	{
+		cout << "Gdestructor:\t" << this << endl;
+	}
+
+	//			Methods:
+	void info()
+	{
+		Student::info();
+		cout << "Òåìà äèïëîìíîãî ïðîåêòà: " << diploma_theme << endl;
+	}
+};
 
 void main()
 {
 	setlocale(LC_ALL, "");
-	int n = 5;
-	List<int> lst1 = { 3,4,5,6,7 };
-	lst1.print();
-	//for (int i = 0; i < lst1.get_size(); i++)lst1[i] = rand() % 100;
-	for (int i = 0; i < lst1.get_size(); i++)
-	{
-		cout << lst1[i] << tab;
-	}
-	cout << endl;
-	for (int i : lst1)
-	{
-		cout << i << tab;
-	}
-	cout << endl;
-#ifdef BASE_CHECK
-	cout << "������� ������ ������: "; cin >> n;
-	List list;
-	for (int i = 0; i < n; i++)
-	{
-		list.push_back(rand() % 100);
-	}
-	list.push_front(123);
-	list.print();
-	list.insert(3, 5);
-	list.pop_front();
-	list.pop_back();
-	list.print();
-	list.erase(3);
-	list.print();
-#endif // BASE_CHECK
+	Human h("Âàñèëèé", 20);
+	h.info();
 
+	Student durko("Äóðêî Âàñèëèé", 20, "ÐÏÎ");
+	durko.info();
+
+	Teacher pablo("Pablo Escobar", 40, "Ðàñïðîñòðàíåíèå íàðêîòèêîâ", 25, 50);
+	pablo.info();
+
+	Graduate tony
+	("Antonio Montana", 22, "Ðàñïðîñòðàíåíèå íàðêîòèêîâ", 5, 90, "Ðàáîòà ñ ïðîáëåìíîé çàäîëæåííîñòüþ");
+	tony.info();
 }
